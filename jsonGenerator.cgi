@@ -8,6 +8,9 @@ require 'ostruct'
 require "csv"
 require "haversine"
 
+
+filePath = "/home/wetter/wetterDATA/"
+
 ############################### assoziative array for errors
 errors = {}
 errorsWrap = {}
@@ -24,7 +27,7 @@ medianCounter = 0
 
 
 ############################### zip code table
-zips = CSV.read("/home/wetter/wetterDATA/de_postal_codes.csv", col_sep: ",", encoding: "ISO8859-1")
+zips = CSV.read(filePath + "de_postal_codes.csv", col_sep: ",", encoding: "ISO8859-1")
 #plz = zips.find {|row| row[1] == stadt.capitalize.strip}
 
 ############################### search zip code table for row with received zip
@@ -39,7 +42,7 @@ lat = zipRow[5].to_f
 
 ############################### create new array with 250 stations around the zip code area, with weak sorting
 stationArray = Array.new()
-SQLite3::Database.open( "/home/wetter/wetterDATA/stationDB.db" ) do |db|
+SQLite3::Database.open( filePath + "stationDB.db" ) do |db|
   db.execute( "SELECT stationID, GeoBreite, GeoLaenge FROM stations as distance
     where #{element.gsub(/\s+/, "")} = 1 and StartDate <= '#{start_date}' and EndDate >= '#{end_date}'
     ORDER BY ABS((#{lat} - GeoBreite)*(#{lat} - GeoBreite)) +
@@ -75,11 +78,11 @@ end
 for i in 0..medianCounter
 
 ############################### check if database is on server
-if !Dir.glob( "/home/wetter/wetterDATA/sql/#{sortedStationArray[i].name}/#{element}.db" ).empty?
+if !Dir.glob( filePath + "sql/#{sortedStationArray[i].name}/#{element}.db" ).empty?
 
 
 ############################### open sqlite database in stationID folder and "element".db
-SQLite3::Database.open( "/home/wetter/wetterDATA/sql/#{sortedStationArray[i].name}/#{element}.db" ) do |db|
+SQLite3::Database.open( filePath + "sql/#{sortedStationArray[i].name}/#{element}.db" ) do |db|
   jsonArray = Array.new()
 
 ############################### iterate through every row from start date to end date
