@@ -19,7 +19,7 @@ zip = cgi["location"]
 start_date = cgi["start_date"]
 end_date = cgi["end_date"]
 
-element = "Relative Luftfeuchte"
+element = "Relative Luftfeuchte".gsub('ö','oe')
 medianCounter = 0
 
 
@@ -41,9 +41,9 @@ lat = zipRow[5].to_f
 stationArray = Array.new()
 SQLite3::Database.open( "/home/wetter/wetterDATA/stationDB.db" ) do |db|
   db.execute( "SELECT stationID, GeoBreite, GeoLaenge FROM stations as distance
-  	where #{element.gsub(/\s+/, "")} = 1 and StartDate <= '#{start_date}' and EndDate >= '#{end_date}'
-  	ORDER BY ABS((#{lat} - GeoBreite)*(#{lat} - GeoBreite)) +
-  	ABS((#{long} - GeoLaenge)*(#{long} - GeoLaenge)) ASC LIMIT 250;" ) do |row|
+    where #{element.gsub(/\s+/, "")} = 1 and StartDate <= '#{start_date}' and EndDate >= '#{end_date}'
+    ORDER BY ABS((#{lat} - GeoBreite)*(#{lat} - GeoBreite)) +
+    ABS((#{long} - GeoLaenge)*(#{long} - GeoLaenge)) ASC LIMIT 250;" ) do |row|
     stationArray.insert(0, row)
   end
 end
@@ -76,7 +76,7 @@ for i in 0..medianCounter
 
 ############################### check if database is on server
 if !Dir.glob( "/home/wetter/wetterDATA/sql/#{sortedStationArray[i].name}/#{element}.db" ).empty?
-end
+
 
 ############################### open sqlite database in stationID folder and "element".db
 SQLite3::Database.open( "/home/wetter/wetterDATA/sql/#{sortedStationArray[i].name}/#{element}.db" ) do |db|
@@ -93,7 +93,6 @@ data["einheit"] = row[2]
 data["date"] = row[3]
 data["element"] = element
 
-
     jsonArray.push(data)
 end #end of row loop
 if !jsonArray.empty?
@@ -101,27 +100,34 @@ if !jsonArray.empty?
 puts header
 puts jsonArray.to_json
 else
-	puts header
-	errors["date"] = "date failure"
-	errorsWrap["errors"] = errors
-	puts errorsWrap.to_json
+  puts header
+  errors["date"] = "date failure"
+  errorsWrap["errors"] = errors
+  puts errorsWrap.to_json
 end
 end #end of station iterate array
-
+else 
+  puts header
+  errors["data"] = "no database"
+  errorsWrap["errors"] = errors
+  puts errorsWrap.to_json
+end #end of database check
 end #end of median loop
 ############################### throw exeption if there is no data
 else
   puts header
-	errors["data"] = "no data"
-	errorsWrap["errors"] = errors
-	puts errorsWrap.to_json
+  errors["data"] = "no data"
+  errorsWrap["errors"] = errors
+  puts errorsWrap.to_json
 end #end of invalid date check
 ############################### throw exeption if the zip code is not valid
 else
   puts header
-	errors["location"] = "no valid zip code"
-	errorsWrap["errors"] = errors
-	puts errorsWrap.to_json
+  errors["location"] = "no valid zip code"
+  errorsWrap["errors"] = errors
+  puts errorsWrap.to_json
 
 end #end of zip code check
+
+
 ################################ end of script
