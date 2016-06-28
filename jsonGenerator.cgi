@@ -42,7 +42,6 @@ def jsonArrayFunc
 			if @i<@sortedStationArray.count 
 				jsonArrayFunc()
 			else #if there is still no data available -> throw error
-				puts @header
 				throwError("data", "no data")
   			end
 		end
@@ -51,7 +50,6 @@ def jsonArrayFunc
 		if @i<@sortedStationArray.count
 			jsonArrayFunc
 		else #if there is still no data available -> throw error
-			puts @header
 			throwError("database", "no database")
 		end 
 	end 
@@ -61,11 +59,9 @@ end
 def runMain
 	if @eDate > (@now - 4) #check if the end date is before now - 4 days
 		@eDate = @eDate-4 #if not, set end date - 4 days
-		throwError("date", "earlier end date") 
 		runMain()
 	elsif (@start_date > @end_date) #check if the startdate is after enddate set startdate to enddate
 		@start_date = @end_date
-		throwError("date", "set start date to end date") 
 		runMain()
 	else
 		@generate = Generate.new(@filePath, @zip, @start_date, @end_date, @element) #create new Generate class
@@ -74,11 +70,9 @@ def runMain
 			throwError("location", "no valid zip code")
 		elsif @end_date < "2000-01-01" #check if the end date is before earliest data
 				@end_date = "2000-01-01"
-						throwError("date", "earliest possible date: 01.01.2000") 
 			runMain()
 		elsif @start_date < "2000-01-01" #check if the startdate is before earliest data
 			@start_date = "2000-01-01"		
-			throwError("date", "earliest possible date: 01.01.2000") 
 			runMain()
 		else
 				lat, long = @generate.geo(zipRow)
@@ -86,7 +80,6 @@ def runMain
 			if stationArray.count < 1 #if there is no data available try the day before 
 				@eDate = @eDate - 1
 				@end_date = (@eDate).to_s
-				throwError("date", "changed enddate") 
 				runMain()
 			else 
 				@sortedStationArray = @generate.sortStationArray(stationArray, lat, long)
