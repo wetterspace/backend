@@ -6,7 +6,7 @@ require_relative 'Generate'
 @cgi = CGI.new
 @header = @cgi.header('type' => 'text/plain', 'Access-Control-Allow-Origin' => "*")
 
-@element = "Relative Luftfeuchte".gsub('ö','oe')
+@element = @cgi["element"].gsub('ö','oe')
 @start_date = @cgi["start_date"]
 @end_date = @cgi["end_date"]
 @sDate = Date.parse @start_date
@@ -30,16 +30,16 @@ end
 #############################################################################################
 
 #############################################################################################
-############################### returns valid json, iterates through station stationarray if necessary or throws error 
+############################### returns valid json, iterates through station stationarray if necessary or throws error
 def jsonArrayFunc
 	if !Dir.glob( @filePath + "sql/#{@sortedStationArray[@i].name}/#{@element}.db" ).empty? #check if database is on server
 			jsonArray = @generate.generateJson(@sortedStationArray[@i]) #execute generateJson function from generate class
 		if !jsonArray.empty? #if there is data to send -> return json
 			puts @header
 			puts jsonArray.to_json
-		else #if there is the right database but not the right data in it try the next station 
+		else #if there is the right database but not the right data in it try the next station
 			@i = @i+1
-			if @i<@sortedStationArray.count 
+			if @i<@sortedStationArray.count
 				jsonArrayFunc()
 			else #if there is still no data available -> throw error
 				throwError("data", "no data")
@@ -51,11 +51,11 @@ def jsonArrayFunc
 			jsonArrayFunc
 		else #if there is still no data available -> throw error
 			throwError("database", "no database")
-		end 
-	end 
+		end
+	end
 end
 #############################################################################################
-############################### main program 
+############################### main program
 def runMain
 	if @eDate > (@now - 4) #check if the end date is before now - 4 days
 		@eDate = @eDate-4 #if not, set end date - 4 days
@@ -65,27 +65,27 @@ def runMain
 		runMain()
 	else
 		@generate = Generate.new(@filePath, @zip, @start_date, @end_date, @element) #create new Generate class
-		zipRow = @generate.findZip(@zip) 
+		zipRow = @generate.findZip(@zip)
 		if zipRow == nil #check if it's a valid zip code
 			throwError("location", "no valid zip code")
 		elsif @end_date < "2000-01-01" #check if the end date is before earliest data
 				@end_date = "2000-01-01"
 			runMain()
 		elsif @start_date < "2000-01-01" #check if the startdate is before earliest data
-			@start_date = "2000-01-01"		
+			@start_date = "2000-01-01"
 			runMain()
 		else
 				lat, long = @generate.geo(zipRow)
 				stationArray = @generate.selectInStationDB(lat, long)
-			if stationArray.count < 1 #if there is no data available try the day before 
+			if stationArray.count < 1 #if there is no data available try the day before
 				@eDate = @eDate - 1
 				@end_date = (@eDate).to_s
 				runMain()
-			else 
+			else
 				@sortedStationArray = @generate.sortStationArray(stationArray, lat, long)
 				jsonArrayFunc()
 			end
-		end 
+		end
 	end
 end
 
