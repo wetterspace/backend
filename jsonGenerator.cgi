@@ -68,15 +68,15 @@ def runMain
 		runMain()
 	else
 		@generate = Generate.new(@filePath, @zip, @start_date, @end_date, @element) #create new Generate class
-<<<<<<< Updated upstream
+
 		zipRow = @generate.findZip(@zip)
 		if zipRow == nil #check if it's a valid zip code
-=======
+
 	
 
 		zipRow = @generate.findZip(@zip)
 		if (zipRow == nil) && (@lat == '' ||@long == '') #check if it's a valid zip code
->>>>>>> Stashed changes
+
 			throwError("location", "no valid zip code")
 		elsif @end_date < "2000-01-01" #check if the end date is before earliest data
 				@end_date = "2000-01-01"
@@ -92,10 +92,9 @@ def runMain
 				lat, long = @generate.geo(zipRow)
 			end
 				stationArray = @generate.selectInStationDB(lat, long)
-<<<<<<< Updated upstream
-=======
 
->>>>>>> Stashed changes
+
+
 			if stationArray.count < 1 #if there is no data available try the day before
 				@eDate = @eDate - 1
 				@end_date = (@eDate).to_s
