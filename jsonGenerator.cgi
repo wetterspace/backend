@@ -4,7 +4,7 @@ require_relative 'Generate'
 @errors = {}
 @errorsWrap = {}
 @cgi = CGI.new
-@header = @cgi.header('type' => 'text/plain', 'Access-Control-Allow-Origin' => "*")
+@header = @cgi.header('type' => 'application/json', 'Access-Control-Allow-Origin' => "*")
 
 @element = @cgi["element"].gsub('ö','oe')
 @start_date = @cgi["start_date"]
