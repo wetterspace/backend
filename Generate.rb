@@ -10,7 +10,7 @@ require "haversine"
 class Generate
 
 	#############################################################################################
-	############################### initialize class
+	# initialize class
 	def initialize(filePath, location, start_date, end_date, element)
 		@filePath = filePath
 		@zip = location
@@ -19,27 +19,24 @@ class Generate
 		@element = element
 	end
 	#############################################################################################
-	
 	#############################################################################################
-	############################### search zip code table for row with received zip
+	# search zip code table for row with received zip
 	def findZip(zipCode)
 			zips = CSV.read(@filePath + "de_postal_codes.csv", col_sep: ",", encoding: "ISO8859-1")
 			zipRow = zips.find {|row| row[0] == zipCode}
 		return zipRow
 	end #findZip end
 	#############################################################################################
-	
 	#############################################################################################
-	############################### extract geo coordinates from zip code
+	# extract geo coordinates from zip code
 	def geo(zipRow)
 			long = zipRow[6].to_f
 			lat = zipRow[5].to_f
 		return lat, long
 	end
 	#############################################################################################
-	
 	#############################################################################################
-	############################### create new array with 250 stations around the zip code area, with weak sorting
+	# create new array with 250 stations around the zip code area, with weak sorting
 	def selectInStationDB(lat, long)
 			stationArray = Array.new()
 			SQLite3::Database.open( @filePath + "stationDB.db" ) do |db|
@@ -54,9 +51,8 @@ class Generate
 		return stationArray
 	end
 	#############################################################################################
-	
 	#############################################################################################
-	############################### sorting the station array exactly per distance
+	# sorting the station array exactly per distance
 	def sortStationArray(stationArray, lat, long)
 		sortedStationArray = Array.new()
 			for i in 0..stationArray.count-1 # iterate through the station array
@@ -72,9 +68,8 @@ class Generate
 		return sortedStationArray
 	end
 	#############################################################################################
-	
 	#############################################################################################
-	############################### extracting the data from database and return array
+	# extracting the data from database and return array
 	def generateJson(sortedStationArray)
 		SQLite3::Database.open(@filePath + "sql/#{sortedStationArray.name}/#{@element}.db" ) do |db|
 			  jsonArray = Array.new()

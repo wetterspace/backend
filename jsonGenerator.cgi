@@ -13,7 +13,6 @@ require_relative 'Generate'
 @eDate = Date.parse @end_date
 @now = Date.today
 @zip = @cgi["location"]
-
 @lat = @cgi["lat"]
 @long = @cgi["long"]
 
@@ -23,7 +22,7 @@ require_relative 'Generate'
 
 
 #############################################################################################
-############################### error handler
+# error handler
 def throwError(kind, message)
   		@errors[kind] = message
   		@errorsWrap["errors"] = @errors
@@ -31,9 +30,8 @@ def throwError(kind, message)
   		puts @errorsWrap.to_json
 end
 #############################################################################################
-
 #############################################################################################
-############################### returns valid json, iterates through station stationarray if necessary or throws error
+# returns valid json, iterates through station stationarray if necessary or throws error
 def jsonArrayFunc
 	if !Dir.glob( @filePath + "sql/#{@sortedStationArray[@i].name}/#{@element}.db" ).empty? #check if database is on server
 			jsonArray = @generate.generateJson(@sortedStationArray[@i]) #execute generateJson function from generate class
@@ -58,7 +56,8 @@ def jsonArrayFunc
 	end
 end
 #############################################################################################
-############################### main program
+#############################################################################################
+# main program
 def runMain
 	if @eDate > (@now - 4) #check if the end date is before now - 4 days
 		@eDate = @eDate-4 #if not, set end date - 4 days
@@ -71,8 +70,6 @@ def runMain
 
 		zipRow = @generate.findZip(@zip)
 		if zipRow == nil #check if it's a valid zip code
-
-	
 
 		zipRow = @generate.findZip(@zip)
 		if (zipRow == nil) && (@lat == '' ||@long == '') #check if it's a valid zip code
@@ -92,8 +89,6 @@ def runMain
 				lat, long = @generate.geo(zipRow)
 			end
 				stationArray = @generate.selectInStationDB(lat, long)
-
-
 
 			if stationArray.count < 1 #if there is no data available try the day before
 				@eDate = @eDate - 1
